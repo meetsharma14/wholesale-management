@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 
 from app.models.user import User
-from app.schemas.user import UserCreate
+from app.schemas.user import PublicUserCreate, UserCreate, UserRole
 from app.core.security import (
     hash_password,
     verify_password,
@@ -13,7 +13,7 @@ def get_user_by_email(db: Session, email: str):
     return db.query(User).filter(User.email == email).first()
 
 
-def create_user(db: Session, user: UserCreate):
+def create_user(db: Session, user: UserCreate | PublicUserCreate, role: UserRole):
     existing_user = get_user_by_email(db, user.email)
 
     if existing_user:
@@ -24,7 +24,7 @@ def create_user(db: Session, user: UserCreate):
         email=user.email,
         phone=user.phone,
         password=hash_password(user.password),
-        role=user.role,
+        role=role,
     )
 
     db.add(new_user)
@@ -32,6 +32,14 @@ def create_user(db: Session, user: UserCreate):
     db.refresh(new_user)
 
     return new_user
+
+
+def create_public_user(db: Session, user: PublicUserCreate):
+    return create_user(db, user, UserRole.RETAILER)
+
+
+def create_managed_user(db: Session, user: UserCreate):
+    return create_user(db, user, user.role)
 
 
 def login_user(db: Session, email: str, password: str):
