@@ -311,7 +311,6 @@ This project is licensed under the MIT License.
 **Meet Sharma**
 
 - GitHub: https://github.com/meetsharma14
-- LinkedIn: *(Add your LinkedIn URL here)*
 
 ---
 
